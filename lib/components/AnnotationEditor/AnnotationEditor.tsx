@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import * as Annotorious from "@recogito/annotorious-openseadragon";
+import Annotorious from "@recogito/annotorious-openseadragon";
 import "@recogito/annotorious-openseadragon/dist/annotorious.min.css";
 import {
   saveAnnotation,
   fetchAnnotations,
   deleteAnnotation,
   updateAnnotation,
-} from "src/plugins/AnnotationEditor/annotation-utils";
-import { type Plugin } from "src/index";
-import { useEditorDispatch } from "./annotation-editor-context";
+} from "../../utils/annotation-utils";
+import { type Plugin } from "@samvera/clover-iiif";
+import { useEditorDispatch } from "../../context/annotation-editor-context";
 import styles from "./AnnotationEditor.module.css";
 
 interface PropType extends Plugin {
@@ -16,7 +16,7 @@ interface PropType extends Plugin {
   annotationServer?: string;
 }
 
-export default function AnnotationEditor(props: PropType) {
+const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
   const {
     canvas,
     openSeadragonViewer,
@@ -149,4 +149,6 @@ export default function AnnotationEditor(props: PropType) {
       </svg>
     </button>
   );
-}
+};
+
+export default AnnotationEditor;

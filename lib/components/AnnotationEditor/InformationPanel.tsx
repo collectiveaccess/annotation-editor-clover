@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
-import { type PluginInformationPanel } from "src/index";
+import { type PluginInformationPanel } from "@samvera/clover-iiif";
 import styles from "./InformationPanel.module.css";
-import { useEditorState } from "./annotation-editor-context";
-
-const AnnotationItem = dynamic(() => import("./AnnotationItem"), {
-  ssr: false,
-});
+import { useEditorState } from "../../context/annotation-editor-context";
+import AnnotationItem from "./AnnotationItem";
 
 interface PropType extends PluginInformationPanel {
   token: string;
