@@ -1,12 +1,21 @@
 import React, { useEffect } from "react";
 import { createOpenSeadragonRect } from "@samvera/clover-iiif/openseadragon-helpers";
 import { parseAnnotationTarget } from "@samvera/clover-iiif/annotation-helpers";
-import { type PluginInformationPanel } from "@samvera/clover-iiif";
+import {
+  type PluginInformationPanel,
+  type AnnotationTargetExtended,
+} from "@samvera/clover-iiif";
+import {
+  AnnotationForEditor,
+  AnnotationBodyForEditor,
+} from "../../types/annotation";
 
 interface PropType extends PluginInformationPanel {
-  annotation: any;
-  setActiveTarget: any;
-  activeTarget: any;
+  annotation: AnnotationForEditor;
+  setActiveTarget: React.Dispatch<
+    React.SetStateAction<AnnotationTargetExtended | string | undefined>
+  >;
+  activeTarget?: AnnotationTargetExtended | string;
 }
 
 const AnnotationItem: React.FC<PropType> = ({

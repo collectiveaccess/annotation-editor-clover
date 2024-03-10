@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { type PluginInformationPanel } from "@samvera/clover-iiif";
+import {
+  type PluginInformationPanel,
+  type AnnotationTargetExtended,
+} from "@samvera/clover-iiif";
 import styles from "./InformationPanel.module.css";
 import { useEditorState } from "../../context/annotation-editor-context";
 import AnnotationItem from "./AnnotationItem";
+import { AnnotationForEditor } from "../../types/annotation";
 
 interface PropType extends PluginInformationPanel {
   token: string;
   annotationServer: string;
+  annotations: AnnotationForEditor[];
 }
 
 export const InfomationPanel: React.FC<PropType> = ({
@@ -20,7 +25,9 @@ export const InfomationPanel: React.FC<PropType> = ({
   token,
   annotationServer,
 }) => {
-  const [activeTarget, setActiveTarget] = useState();
+  const [activeTarget, setActiveTarget] = useState<
+    AnnotationTargetExtended | string
+  >();
   const [clippings, setClippings] = useState(annotations);
 
   const editorState = useEditorState();
@@ -52,7 +59,7 @@ export const InfomationPanel: React.FC<PropType> = ({
         <a href="">View all clippings.</a>
       </p>
       <p>Clippings from this record</p>
-      {clippings?.map((clipping: any) => (
+      {clippings?.map((clipping) => (
         <AnnotationItem
           key={clipping.id}
           annotation={clipping}

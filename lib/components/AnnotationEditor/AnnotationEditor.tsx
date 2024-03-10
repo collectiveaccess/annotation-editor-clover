@@ -10,6 +10,7 @@ import {
 import { type Plugin } from "@samvera/clover-iiif";
 import { useEditorDispatch } from "../../context/annotation-editor-context";
 import styles from "./AnnotationEditor.module.css";
+import { AnnotationFromAnnotorious } from "../../types/annotation";
 
 interface PropType extends Plugin {
   token?: string;
@@ -45,7 +46,7 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
     const anno = Annotorious(openSeadragonViewer, options);
 
     // set up CRUD
-    anno.on("createAnnotation", (annotation: any) => {
+    anno.on("createAnnotation", (annotation: AnnotationFromAnnotorious) => {
       saveAnnotation(
         annotation,
         activeManifest,
@@ -60,7 +61,7 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
         });
       });
     });
-    anno.on("updateAnnotation", (annotation: any) => {
+    anno.on("updateAnnotation", (annotation: AnnotationFromAnnotorious) => {
       updateAnnotation(
         annotation,
         activeManifest,
@@ -75,7 +76,7 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
         });
       });
     });
-    anno.on("deleteAnnotation", (annotation: any) => {
+    anno.on("deleteAnnotation", (annotation: AnnotationFromAnnotorious) => {
       deleteAnnotation(
         annotation,
         activeManifest,
@@ -106,7 +107,7 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
         annotationServer,
       );
 
-      savedAnnotations.forEach((annotation: any) => {
+      savedAnnotations.forEach((annotation) => {
         try {
           anno.addAnnotation(annotation);
         } catch (error) {
