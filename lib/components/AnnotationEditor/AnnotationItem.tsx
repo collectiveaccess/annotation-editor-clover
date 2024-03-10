@@ -70,7 +70,7 @@ const AnnotationItem: React.FC<PropType> = ({
     }
   }
 
-  function renderItem(body, i) {
+  function renderItem(body: any, i: number) {
     if (body.format === "image/jpeg") {
       return <img key={i} src={body.id} />;
     } else if (body.type === "TextualBody") {
@@ -80,7 +80,7 @@ const AnnotationItem: React.FC<PropType> = ({
 
   return (
     <div onClick={handleClick}>
-      {annotation.body.map((body, i) => renderItem(body, i))}
+      {annotation.body.map((body: any, i: number) => renderItem(body, i))}
     </div>
   );
 };

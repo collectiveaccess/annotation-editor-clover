@@ -52,7 +52,7 @@ export const InfomationPanel: React.FC<PropType> = ({
         <a href="">View all clippings.</a>
       </p>
       <p>Clippings from this record</p>
-      {clippings?.map((clipping) => (
+      {clippings?.map((clipping: any) => (
         <AnnotationItem
           key={clipping.id}
           annotation={clipping}

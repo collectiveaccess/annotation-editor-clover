@@ -69,7 +69,7 @@ export function convertWebAnnotation(
       format: "text/plain",
     };
   } else if (webAnnotation.body.length > 1) {
-    annotation.body = webAnnotation.body.map((ann) => {
+    annotation.body = webAnnotation.body.map((ann: any) => {
       return {
         type: ann.type,
         value: ann.value,
@@ -145,13 +145,16 @@ export async function fetchAnnotations(
   return annotations;
 }
 
-function processSavedAnnotation(savedAnnotation, unit: "pixel" | "percent") {
+function processSavedAnnotation(
+  savedAnnotation: any,
+  unit: "pixel" | "percent",
+) {
   const webAnnotations = [] as any;
 
-  savedAnnotation.items.forEach((ann) => {
+  savedAnnotation.items.forEach((ann: any) => {
     let body;
     if (Array.isArray(ann.body)) {
-      body = ann.body.map((b) => {
+      body = ann.body.map((b: any) => {
         return { purpose: "commenting", type: b.type, value: b.value };
       });
     } else {
@@ -178,7 +181,7 @@ function processSavedAnnotation(savedAnnotation, unit: "pixel" | "percent") {
 }
 
 export async function deleteAnnotation(
-  webAnnotation,
+  webAnnotation: any,
   manifestId: string,
   activeCanvas: string,
   unit: "pixel" | "percent",
@@ -209,7 +212,7 @@ export async function deleteAnnotation(
       const selectedAnnotations = annotations[activeCanvas];
       if (selectedAnnotations) {
         const otherAnnotations = selectedAnnotations.items.filter(
-          (ann) => ann.id !== webAnnotation.id,
+          (ann: any) => ann.id !== webAnnotation.id,
         );
         annotations[activeCanvas] = {
           id: activeCanvas,
@@ -223,7 +226,7 @@ export async function deleteAnnotation(
 }
 
 export async function updateAnnotation(
-  webAnnotation,
+  webAnnotation: any,
   manifestId: string,
   activeCanvas: string,
   unit: "pixel" | "percent",
@@ -254,7 +257,7 @@ export async function updateAnnotation(
       const selectedAnnotations = annotations[activeCanvas];
       if (selectedAnnotations) {
         const updatedAnnotations: any = [];
-        selectedAnnotations.items.forEach((ann) => {
+        selectedAnnotations.items.forEach((ann: any) => {
           if (ann.id === webAnnotation.id) {
             updatedAnnotations.push(
               convertWebAnnotation(

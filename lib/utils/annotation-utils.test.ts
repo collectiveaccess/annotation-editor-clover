@@ -1,3 +1,4 @@
+import { describe, it, expect, afterEach } from "vitest";
 import {
   saveAnnotation,
   deleteAnnotation,
@@ -21,7 +22,7 @@ const webAnnotation1 = {
   id: "123abc",
 };
 
-const annotation1 = (manifest, canvas) => {
+const annotation1 = (manifest: string, canvas: string) => {
   return {
     type: "Annotation",
     body: { type: "TextualBody", value: "first", format: "text/plain" },
@@ -62,7 +63,7 @@ const webAnnotation2 = {
   },
   id: "456def",
 };
-const annotation2 = (manifest, canvas) => {
+const annotation2 = (manifest: string, canvas: string) => {
   return {
     type: "Annotation",
     body: { type: "TextualBody", value: "second", format: "text/plain" },
@@ -107,7 +108,7 @@ const webAnnotationMultipleBodies = {
   id: "123abc",
 };
 
-const annotationMultipleBodies = (manifest, canvas) => {
+const annotationMultipleBodies = (manifest: string, canvas: string) => {
   return {
     type: "Annotation",
     body: [
@@ -582,7 +583,7 @@ describe("fetchAnnotations with guest user", () => {
 
     const res = await fetchAnnotations(canvas, unit);
 
-    const expected = [];
+    const expected: any = [];
     expect(res).toStrictEqual(expected);
   });
 
@@ -635,7 +636,7 @@ describe("fetchAnnotations with guest user", () => {
 
     const res = await fetchAnnotations(canvas2, unit);
 
-    const expected = [];
+    const expected: any = [];
     expect(res).toStrictEqual(expected);
   });
 

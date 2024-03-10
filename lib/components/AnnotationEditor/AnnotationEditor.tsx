@@ -45,7 +45,7 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
     const anno = Annotorious(openSeadragonViewer, options);
 
     // set up CRUD
-    anno.on("createAnnotation", (annotation) => {
+    anno.on("createAnnotation", (annotation: any) => {
       saveAnnotation(
         annotation,
         activeManifest,
@@ -60,7 +60,7 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
         });
       });
     });
-    anno.on("updateAnnotation", (annotation) => {
+    anno.on("updateAnnotation", (annotation: any) => {
       updateAnnotation(
         annotation,
         activeManifest,
@@ -75,7 +75,7 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
         });
       });
     });
-    anno.on("deleteAnnotation", (annotation) => {
+    anno.on("deleteAnnotation", (annotation: any) => {
       deleteAnnotation(
         annotation,
         activeManifest,
@@ -106,7 +106,7 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
         annotationServer,
       );
 
-      savedAnnotations.forEach((annotation) => {
+      savedAnnotations.forEach((annotation: any) => {
         try {
           anno.addAnnotation(annotation);
         } catch (error) {
