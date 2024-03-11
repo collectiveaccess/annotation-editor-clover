@@ -82,17 +82,41 @@ const AnnotationItem: React.FC<PropType> = ({
     }
   }
 
-  function renderItem(body: any, i: number) {
-    if (body.format === "image/jpeg") {
-      return <img key={i} src={body.id} />;
+  function renderBody(body: AnnotationBodyForEditor, i: number) {
+    if (typeof body === "string") {
+      return (
+        <div key={i} className="clipping-text">
+          {body}
+        </div>
+      );
+    } else if (body.type === "Image") {
+      return <img src={body.value} key={i} className="clipping-image" />;
     } else if (body.type === "TextualBody") {
-      return <div key={i}>{body.value}</div>;
+      return (
+        <div key={i} className="clipping-text">
+          {body.value}
+        </div>
+      );
     }
   }
 
+  function processBody(
+    body: AnnotationBodyForEditor | AnnotationBodyForEditor[],
+  ) {
+    if (Array.isArray(body)) {
+      return body.map((body, i: number) => {
+        return renderBody(body, i);
+      });
+    } else {
+      return renderBody(body, 0);
+    }
+  }
+
+  if (!annotation.body) return <></>;
+
   return (
-    <div onClick={handleClick}>
-      {annotation.body.map((body: any, i: number) => renderItem(body, i))}
+    <div className="clipping" onClick={handleClick}>
+      {processBody(annotation.body)}
     </div>
   );
 };
