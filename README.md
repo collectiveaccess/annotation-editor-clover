@@ -16,7 +16,7 @@ import {
   InformationPanel,
   AnnotationEditor,
   EditorProvider,
-} from "annotation_editor_clover";
+} from "annotation-editor-clover";
 
 function App() {
   const url = "http://localhost:3000";
