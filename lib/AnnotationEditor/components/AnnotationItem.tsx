@@ -8,7 +8,7 @@ import {
 import {
   AnnotationForEditor,
   AnnotationBodyForEditor,
-} from "../../types/annotation";
+} from "../types/annotation";
 
 interface PropType extends PluginInformationPanel {
   annotation: AnnotationForEditor;

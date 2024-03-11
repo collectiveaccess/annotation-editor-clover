@@ -6,11 +6,11 @@ import {
   fetchAnnotations,
   deleteAnnotation,
   updateAnnotation,
-} from "../../utils/annotation-utils";
+} from "../utils/annotation-utils";
 import { type Plugin } from "@samvera/clover-iiif";
-import { useEditorDispatch } from "../../context/annotation-editor-context";
+import { useEditorDispatch } from "../context/annotation-editor-context";
 import styles from "./AnnotationEditor.module.css";
-import { AnnotationFromAnnotorious } from "../../types/annotation";
+import { AnnotationFromAnnotorious } from "../types/annotation";
 
 interface PropType extends Plugin {
   token?: string;

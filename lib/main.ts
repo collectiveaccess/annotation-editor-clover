@@ -1,6 +1,6 @@
 export {
   AnnotationEditor,
   InformationPanel,
-} from "./components/AnnotationEditor";
+} from "./AnnotationEditor/components";
 
-export { EditorProvider } from "./context";
+export { EditorProvider } from "./AnnotationEditor/context";

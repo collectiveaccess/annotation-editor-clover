@@ -4,9 +4,9 @@ import {
   type AnnotationTargetExtended,
 } from "@samvera/clover-iiif";
 import styles from "./InformationPanel.module.css";
-import { useEditorState } from "../../context/annotation-editor-context";
+import { useEditorState } from "../context/annotation-editor-context";
 import AnnotationItem from "./AnnotationItem";
-import { AnnotationForEditor } from "../../types/annotation";
+import { AnnotationForEditor } from "../types/annotation";
 
 interface PropType extends PluginInformationPanel {
   token: string;
