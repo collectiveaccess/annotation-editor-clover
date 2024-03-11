@@ -57,7 +57,10 @@ const AnnotationItem: React.FC<PropType> = ({
 
     const zoomLevel = viewerConfigOptions.annotationOverlays?.zoomLevel || 1;
 
-    const parsedAnnotationTarget = parseAnnotationTarget(annotation.target);
+    const target = Array.isArray(annotation.target)
+      ? annotation.target[0]
+      : annotation.target;
+    const parsedAnnotationTarget = parseAnnotationTarget(target);
     const { rect, id } = parsedAnnotationTarget;
 
     if (rect) {
