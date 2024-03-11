@@ -32,6 +32,7 @@ const AnnotationItem: React.FC<PropType> = ({
   // zoom to activeTarget when openSeadragonViewer changes
   useEffect(() => {
     if (!openSeadragonViewer) return;
+    if (!annotation.target) return;
     if (annotation.target != activeTarget) return;
     const zoomLevel = viewerConfigOptions.annotationOverlays?.zoomLevel || 1;
 
@@ -77,7 +78,7 @@ const AnnotationItem: React.FC<PropType> = ({
           canvasId: id,
         });
 
-        setActiveTarget(annotation.target);
+        setActiveTarget(target);
       }
     }
   }
