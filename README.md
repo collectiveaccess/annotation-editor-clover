@@ -52,8 +52,6 @@ function App() {
             },
           ]}
           options={{
-            // don't add red overlays for clippings
-            ignoreAnnotationOverlaysLabels: ["Clippings"],
             informationPanel: { open: true, renderAbout: false },
           }}
         />
