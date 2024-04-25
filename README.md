@@ -33,11 +33,13 @@ function App() {
             {
               id: "AnnotationEditor",
               // add button to menu bar that activates Annotorious
-              menu: {
-                component: AnnotationEditor,
-                componentProps: {
-                  annotationServer: `${url}/api/annotationsByCanvas/1`,
-                  token: "123abc",
+              imageViewer: {
+                menu: {
+                  component: AnnotationEditor,
+                  componentProps: {
+                    annotationServer: `${url}/api/annotationsByCanvas/1`,
+                    token: "123abc",
+                  },
                 },
               },
               // displays the clipping in the side information panel
