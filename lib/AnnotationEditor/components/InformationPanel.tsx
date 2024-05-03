@@ -9,13 +9,11 @@ import {
   useEditorDispatch,
 } from "../context/annotation-editor-context";
 import AnnotationItem from "./AnnotationItem";
-import { AnnotationForEditor } from "../types/annotation";
 import { fetchAnnotations } from "../utils/annotation-utils";
 
 interface PropType extends PluginInformationPanel {
   token: string;
   annotationServer: string;
-  annotations: AnnotationForEditor[];
 }
 
 export const InfomationPanel: React.FC<PropType> = ({

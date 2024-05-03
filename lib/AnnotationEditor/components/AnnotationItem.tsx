@@ -26,11 +26,15 @@ const AnnotationItem: React.FC<PropType> = ({
   useViewerDispatch,
   setActiveTarget,
   activeTarget,
+  useViewerState,
 }) => {
   const dispatch: any = useViewerDispatch();
+  const viewerState = useViewerState();
+  const { OSDImageLoaded } = viewerState;
 
   // zoom to activeTarget when openSeadragonViewer changes
   useEffect(() => {
+    if (!OSDImageLoaded) return;
     if (!openSeadragonViewer) return;
     if (!annotation.target) return;
     if (annotation.target != activeTarget) return;
@@ -47,11 +51,12 @@ const AnnotationItem: React.FC<PropType> = ({
           zoomLevel,
         );
         openSeadragonViewer?.viewport.fitBounds(rect2);
+        setActiveTarget(undefined);
       }
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openSeadragonViewer]);
+  }, [openSeadragonViewer, OSDImageLoaded]);
 
   function handleClick() {
     if (!annotation.target) return;
@@ -73,6 +78,10 @@ const AnnotationItem: React.FC<PropType> = ({
         );
         openSeadragonViewer?.viewport.fitBounds(rect2);
       } else {
+        dispatch({
+          type: "updateOSDImageLoaded",
+          OSDImageLoaded: false,
+        });
         dispatch({
           type: "updateActiveCanvas",
           canvasId: id,
