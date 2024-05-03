@@ -4,12 +4,14 @@ export interface EditorContextStore {
   zoomLevel: number;
   annotationsUpdatedAt: string;
   annotations: any;
+  annotorious: any;
 }
 
 interface EditorAction {
   type: string;
   annotationsUpdatedAt: string;
   annotations: any;
+  annotorious: any;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -17,6 +19,7 @@ export const defaultState: EditorContextStore = {
   zoomLevel: 2,
   annotationsUpdatedAt: "",
   annotations: [],
+  annotorious: 9999,
 };
 
 const EditorStateContext =
@@ -36,6 +39,12 @@ function EditorReducer(state: EditorContextStore, action: EditorAction) {
       return {
         ...state,
         annotations: action.annotations,
+      };
+    }
+    case "updateAnnotorious": {
+      return {
+        ...state,
+        annotorious: action.annotorious,
       };
     }
     default: {

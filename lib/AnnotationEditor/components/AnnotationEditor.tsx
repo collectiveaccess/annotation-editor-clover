@@ -31,12 +31,11 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
   } = props;
 
   const [active, setActive] = useState(false);
-  const [editor, setEditor] = useState<any>();
   const [viewerId, setViewerId] = useState(openSeadragonViewer?.id);
 
   const editorDispatch: any = useEditorDispatch();
   const editorState = useEditorState();
-  const { annotations } = editorState;
+  const { annotations, annotorious } = editorState;
 
   const activeCanvas = canvas.id;
   const fragmentUnit = "pixel";
@@ -45,7 +44,6 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
   // fetch annotations on page load
   useEffect(() => {
     if (!fetchAnnotationRan.current && annotations.length === 0) {
-      console.log("AnnotationEditor fetch annotations");
 
       fetchAnnotations(token, annotationServer).then((response) => {
         editorDispatch({
@@ -66,7 +64,6 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
     if (!openSeadragonViewer) return;
     if (openSeadragonViewer.id == viewerId) return;
 
-    console.log("set up Annotorious");
 
     // set up Annotorious
     const options = {
@@ -137,7 +134,10 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
       setActive(false);
     });
 
-    setEditor(annotoriousInstance);
+    editorDispatch({
+      type: "updateAnnotorious",
+      annotorious: annotoriousInstance,
+    });
     setViewerId(openSeadragonViewer.id);
 
     // destroy Annotorious instance
@@ -151,12 +151,11 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
 
   // add annotations for current canvas to annotorious
   useEffect(() => {
-    if (editor && annotations.length > 0) {
-      console.log("annotorious.addAnnotation()");
+    if (annotorious && annotations.length > 0) {
       annotations.forEach((annotation) => {
         try {
           if (annotation.target.source.id === activeCanvas) {
-            editor.addAnnotation(
+            annotorious.addAnnotation(
               convertIIIFAnnotationToWebAnnotation(annotation, "pixel"),
             );
           }
@@ -165,15 +164,17 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
         }
       });
     }
-  }, [annotations, editor, activeCanvas]);
+  }, [annotations, annotorious, activeCanvas]);
 
   function clickHandler() {
-    editor.setDrawingTool("rect");
-    editor.setDrawingEnabled(!active);
+    if (!annotorious) return;
+
+    annotorious.setDrawingTool("rect");
+    annotorious.setDrawingEnabled(!active);
     setActive(!active);
   }
 
-  if (!editor) return <></>;
+  if (!annotorious) return <></>;
 
   return (
     <button
