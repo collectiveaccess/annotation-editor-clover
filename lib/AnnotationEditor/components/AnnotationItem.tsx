@@ -52,6 +52,7 @@ const AnnotationItem: React.FC<PropType> = ({
           zoomLevel,
         );
         openSeadragonViewer?.viewport.fitBounds(rect2);
+        highlightAnnotation(annotation);
         setActiveTarget(undefined);
       }
     }
@@ -76,6 +77,7 @@ const AnnotationItem: React.FC<PropType> = ({
           zoomLevel,
         );
         openSeadragonViewer?.viewport.fitBounds(rect2);
+        highlightAnnotation(annotation);
       } else {
         dispatch({
           type: "updateOSDImageLoaded",
@@ -88,6 +90,18 @@ const AnnotationItem: React.FC<PropType> = ({
 
         setActiveTarget(target);
       }
+    }
+  }
+
+  function highlightAnnotation(annotation: AnnotationForEditor) {
+    const allAnnotationEls = document.querySelectorAll(".a9s-annotation");
+    if (allAnnotationEls) {
+      allAnnotationEls.forEach((el) => el.classList.remove("selected"));
+    }
+
+    const annotationEl = document.querySelector(`[data-id='${annotation.id}']`);
+    if (annotationEl) {
+      annotationEl.classList.add("selected");
     }
   }
 
