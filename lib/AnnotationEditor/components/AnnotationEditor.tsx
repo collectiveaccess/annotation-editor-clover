@@ -32,6 +32,8 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
 
   const [active, setActive] = useState(false);
   const [editor, setEditor] = useState<any>();
+  const [viewerId, setViewerId] = useState(openSeadragonViewer?.id);
+
   const editorDispatch: any = useEditorDispatch();
   const editorState = useEditorState();
   const { annotations } = editorState;
@@ -40,12 +42,12 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
   const fragmentUnit = "pixel";
   const fetchAnnotationRan = useRef(false);
 
-  // fetch annotations
+  // fetch annotations on page load
   useEffect(() => {
-    if (!fetchAnnotationRan.current) {
-      fetchAnnotations(token, annotationServer).then((response) => {
-        console.log("AnnotationEditor fetch annotations", editor);
+    if (!fetchAnnotationRan.current && annotations.length === 0) {
+      console.log("AnnotationEditor fetch annotations");
 
+      fetchAnnotations(token, annotationServer).then((response) => {
         editorDispatch({
           type: "updateAnnotations",
           annotations: response,
@@ -56,11 +58,14 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
     return () => {
       fetchAnnotationRan.current = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // create Annotorious instance for each openSeadragonViewer instance
+  // create Annotorious instance if there is new openSeadragonViewer instance
   useEffect(() => {
     if (!openSeadragonViewer) return;
+    if (openSeadragonViewer.id == viewerId) return;
+
     console.log("set up Annotorious");
 
     // set up Annotorious
@@ -131,17 +136,20 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
     annotoriousInstance.on("createSelection", () => {
       setActive(false);
     });
+
     setEditor(annotoriousInstance);
+    setViewerId(openSeadragonViewer.id);
 
     // destroy Annotorious instance
     return () => {
+      console.log("annotoriousInstance.destroy");
       annotoriousInstance.destroy();
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openSeadragonViewer]);
 
-  // add annotations to annotorious
+  // add annotations for current canvas to annotorious
   useEffect(() => {
     if (editor && annotations.length > 0) {
       console.log("annotorious.addAnnotation()");

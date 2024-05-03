@@ -44,6 +44,10 @@ export const InfomationPanel: React.FC<PropType> = ({
         type: "updateAnnotations",
         annotations: response,
       });
+      dispatch({
+        type: "annotationsUpdatedAt",
+        annotationsUpdatedAt: undefined,
+      });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [annotationsUpdatedAt]);

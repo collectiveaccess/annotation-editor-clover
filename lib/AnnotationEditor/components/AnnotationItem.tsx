@@ -56,7 +56,7 @@ const AnnotationItem: React.FC<PropType> = ({
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openSeadragonViewer, OSDImageLoaded]);
+  }, [openSeadragonViewer.id, OSDImageLoaded]);
 
   function handleClick() {
     if (!annotation.target) return;
