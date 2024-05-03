@@ -3,4 +3,4 @@ export {
   InformationPanel,
 } from "./AnnotationEditor/components";
 
-export { EditorProvider } from "./AnnotationEditor/context";
+export { EditorProvider, defaultState } from "./AnnotationEditor/context";

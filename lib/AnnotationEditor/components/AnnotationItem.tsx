@@ -9,6 +9,7 @@ import {
   AnnotationForEditor,
   AnnotationBodyForEditor,
 } from "../types/annotation";
+import { useEditorState } from "../context/annotation-editor-context";
 
 interface PropType extends PluginInformationPanel {
   annotation: AnnotationForEditor;
@@ -20,7 +21,6 @@ interface PropType extends PluginInformationPanel {
 
 const AnnotationItem: React.FC<PropType> = ({
   annotation,
-  viewerConfigOptions,
   canvas,
   openSeadragonViewer,
   useViewerDispatch,
@@ -31,6 +31,8 @@ const AnnotationItem: React.FC<PropType> = ({
   const dispatch: any = useViewerDispatch();
   const viewerState = useViewerState();
   const { OSDImageLoaded } = viewerState;
+  const editorState = useEditorState();
+  const { zoomLevel } = editorState;
 
   // zoom to activeTarget when openSeadragonViewer changes
   useEffect(() => {
@@ -38,7 +40,6 @@ const AnnotationItem: React.FC<PropType> = ({
     if (!openSeadragonViewer) return;
     if (!annotation.target) return;
     if (annotation.target != activeTarget) return;
-    const zoomLevel = viewerConfigOptions.annotationOverlays?.zoomLevel || 1;
 
     const parsedAnnotationTarget = parseAnnotationTarget(annotation.target);
     const { rect, id } = parsedAnnotationTarget;
@@ -60,8 +61,6 @@ const AnnotationItem: React.FC<PropType> = ({
 
   function handleClick() {
     if (!annotation.target) return;
-
-    const zoomLevel = viewerConfigOptions.annotationOverlays?.zoomLevel || 1;
 
     const target = Array.isArray(annotation.target)
       ? annotation.target[0]

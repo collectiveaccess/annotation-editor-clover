@@ -1,3 +1,3 @@
-import { EditorProvider } from "./annotation-editor-context";
+import { EditorProvider, defaultState } from "./annotation-editor-context";
 
-export { EditorProvider };
+export { EditorProvider, defaultState };

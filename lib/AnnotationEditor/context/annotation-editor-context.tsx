@@ -1,26 +1,20 @@
 import React, { useReducer } from "react";
 
-export type ConfigOptions = {
-  [k: string]: any;
-};
-
-const defaultConfigOptions: ConfigOptions = {};
-
 export interface EditorContextStore {
-  configOptions: ConfigOptions;
+  zoomLevel: number;
   annotationsUpdatedAt: string;
   annotations: any;
 }
 
 interface EditorAction {
   type: string;
-  configOptions: ConfigOptions;
   annotationsUpdatedAt: string;
   annotations: any;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const defaultState: EditorContextStore = {
-  configOptions: defaultConfigOptions,
+  zoomLevel: 2,
   annotationsUpdatedAt: "",
   annotations: [],
 };
@@ -32,15 +26,6 @@ const EditorDispatchContext =
 
 function EditorReducer(state: EditorContextStore, action: EditorAction) {
   switch (action.type) {
-    case "updateConfigOptions": {
-      return {
-        ...state,
-        configOptions: {
-          ...defaultConfigOptions,
-          ...action.configOptions,
-        },
-      };
-    }
     case "annotationsUpdatedAt": {
       return {
         ...state,
