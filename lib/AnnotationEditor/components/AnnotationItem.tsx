@@ -33,17 +33,13 @@ const AnnotationItem: React.FC<PropType> = ({
   const { OSDImageLoaded } = viewerState;
   const editorState = useEditorState();
   const { zoomLevel } = editorState;
-  console.log("AnnotationItem mounted", annotation.id);
 
   // zoom to activeTarget when openSeadragonViewer changes
   useEffect(() => {
-    console.log("AnnotationItem useEffect: zoom 1");
-
     if (!OSDImageLoaded) return;
     if (!openSeadragonViewer) return;
     if (!annotation.target) return;
     if (annotation.target != activeTarget) return;
-    console.log("AnnotationItem useEffect: zoom 2");
 
     const parsedAnnotationTarget = parseAnnotationTarget(annotation.target);
     const { rect, id } = parsedAnnotationTarget;

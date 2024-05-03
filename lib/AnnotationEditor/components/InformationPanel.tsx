@@ -26,8 +26,6 @@ export const InfomationPanel: React.FC<PropType> = ({
   token,
   annotationServer,
 }) => {
-  console.log("InfomationPanel mounted");
-
   const [activeTarget, setActiveTarget] = useState<
     AnnotationTargetExtended | string
   >();
@@ -38,12 +36,10 @@ export const InfomationPanel: React.FC<PropType> = ({
 
   // fetch annotations when there is a change in annotationsUpdatedAt
   useEffect(() => {
-    console.log("InfomationPanel useEffect: fetchAnnotations 1");
-
     if (!annotationsUpdatedAt) return;
 
     fetchAnnotations(token, annotationServer).then((response) => {
-      console.log("InfomationPanel useEffect: fetchAnnotations 2", response);
+      console.log("InfomationPanel fetchAnnotations", response);
       dispatch({
         type: "updateAnnotations",
         annotations: response,
