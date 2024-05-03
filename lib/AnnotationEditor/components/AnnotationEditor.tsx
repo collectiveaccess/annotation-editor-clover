@@ -22,6 +22,8 @@ interface PropType extends Plugin {
 }
 
 const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
+  console.log("AnnotationEditor mounted");
+
   const {
     canvas,
     openSeadragonViewer,
@@ -43,7 +45,9 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
 
   // fetch annotations on page load
   useEffect(() => {
+    console.log("AnnotationEditor useEffect: fetch annotations 1");
     if (!fetchAnnotationRan.current && annotations.length === 0) {
+      console.log("AnnotationEditor useEffect: fetch annotations 2");
 
       fetchAnnotations(token, annotationServer).then((response) => {
         editorDispatch({
@@ -61,9 +65,12 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
 
   // create Annotorious instance if there is new openSeadragonViewer instance
   useEffect(() => {
+    console.log("AnnotationEditor useEffect: set up Annotorious 1");
+
     if (!openSeadragonViewer) return;
     if (openSeadragonViewer.id == viewerId) return;
 
+    console.log("AnnotationEditor useEffect: set up Annotorious 2");
 
     // set up Annotorious
     const options = {
@@ -151,7 +158,10 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
 
   // add annotations for current canvas to annotorious
   useEffect(() => {
+    console.log("AnnotationEditor useEffect: annotorious.addAnnotation() 1");
+
     if (annotorious && annotations.length > 0) {
+      console.log("AnnotationEditor useEffect: annotorious.addAnnotation() 2");
       annotations.forEach((annotation) => {
         try {
           if (annotation.target.source.id === activeCanvas) {
