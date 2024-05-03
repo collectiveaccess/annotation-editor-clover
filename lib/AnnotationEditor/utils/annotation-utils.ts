@@ -22,7 +22,6 @@ export async function saveAnnotation(
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        canvas: activeCanvas,
         annotation: convertWebAnnotationToIIIFAnnotation(
           webAnnotation,
           manifestId,
@@ -74,30 +73,21 @@ export async function saveAnnotation(
 }
 
 export async function fetchAnnotations(
-  activeCanvas: string,
-  unit: "pixel" | "percent",
   token?: string,
   annotationServer?: string,
-): Promise<AnnotationForAnnotorious[]> {
-  let annotations: AnnotationForAnnotorious[] = [];
+): Promise<AnnotationForEditor[]> {
+  let annotations: AnnotationForEditor[] = [];
 
   if (token && annotationServer) {
-    const res = await fetch(annotationServer + "?action=GET", {
-      method: "POST",
+    const res = await fetch(annotationServer, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        canvas: activeCanvas,
-      }),
     });
     if (res.ok) {
-      const savedAnnotations = await res.json();
-      annotations = convertIIIFAnnotationPageToWebAnnotations(
-        savedAnnotations,
-        unit,
-      );
+      const data = await res.json();
+      annotations = data.items;
     } else {
       const error = await res.json();
       console.error(error);
@@ -105,12 +95,17 @@ export async function fetchAnnotations(
   } else if (!token) {
     const savedAnnotationsAll = window.localStorage.getItem("annotations");
     if (savedAnnotationsAll) {
-      const savedAnnotation = JSON.parse(savedAnnotationsAll)[activeCanvas];
+      const savedAnnotation = JSON.parse(savedAnnotationsAll) as {
+        [k: string]: AnnotationPageForEditor;
+      };
+
       if (savedAnnotation) {
-        annotations = convertIIIFAnnotationPageToWebAnnotations(
-          savedAnnotation,
-          unit,
+        let tmp: AnnotationForEditor[] = [];
+        Object.values(savedAnnotation).forEach(
+          (ann) => (tmp = tmp.concat(ann.items)),
         );
+
+        annotations = tmp;
       }
     }
   }
@@ -134,7 +129,6 @@ export async function deleteAnnotation(
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        canvas: activeCanvas,
         annotation: convertWebAnnotationToIIIFAnnotation(
           webAnnotation,
           manifestId,
@@ -179,7 +173,6 @@ export async function updateAnnotation(
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        canvas: activeCanvas,
         annotation: convertWebAnnotationToIIIFAnnotation(
           webAnnotation,
           manifestId,
@@ -273,46 +266,43 @@ export function convertWebAnnotationToIIIFAnnotation(
   return annotation;
 }
 
-export function convertIIIFAnnotationPageToWebAnnotations(
-  savedAnnotation: AnnotationPageForEditor,
+export function convertIIIFAnnotationToWebAnnotation(
+  annotation: AnnotationForEditor,
   unit: "pixel" | "percent",
-): AnnotationForAnnotorious[] {
-  const webAnnotations: AnnotationForAnnotorious[] = [];
+): AnnotationForAnnotorious {
+  const annotationBody = annotation.body;
 
-  savedAnnotation.items?.forEach((ann) => {
-    const annotationBody = ann.body;
-
-    let body: AnnotationBodyAnnotorious[];
-    if (!annotationBody) {
-      body = [];
-    } else if (Array.isArray(annotationBody)) {
-      body = annotationBody.map((body) => {
-        return { purpose: "commenting", type: body.type, value: body.value };
-      });
-    } else {
-      body = [
-        {
-          purpose: "commenting",
-          type: annotationBody.type,
-          value: annotationBody.value,
-        },
-      ];
-    }
-    webAnnotations.push({
-      "@context": "http://www.w3.org/ns/anno.jsonld",
-      type: "Annotation",
-      body: body,
-      target: {
-        source: ann.target.source,
-        selector: {
-          type: ann.target.selector.type,
-          conformsTo: ann.target.selector.conformsTo,
-          value: ann.target.selector.value.replace("xywh=", `xywh=${unit}:`),
-        },
-      },
-      id: ann.id,
+  let body: AnnotationBodyAnnotorious[];
+  if (!annotationBody) {
+    body = [];
+  } else if (Array.isArray(annotationBody)) {
+    body = annotationBody.map((body) => {
+      return { purpose: "commenting", type: body.type, value: body.value };
     });
-  });
-
-  return webAnnotations;
+  } else {
+    body = [
+      {
+        purpose: "commenting",
+        type: annotationBody.type,
+        value: annotationBody.value,
+      },
+    ];
+  }
+  return {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    type: "Annotation",
+    body: body,
+    target: {
+      source: annotation.target.source,
+      selector: {
+        type: annotation.target.selector.type,
+        conformsTo: annotation.target.selector.conformsTo,
+        value: annotation.target.selector.value.replace(
+          "xywh=",
+          `xywh=${unit}:`,
+        ),
+      },
+    },
+    id: annotation.id,
+  };
 }

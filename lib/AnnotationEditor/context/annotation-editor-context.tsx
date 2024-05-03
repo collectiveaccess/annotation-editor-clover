@@ -8,18 +8,21 @@ const defaultConfigOptions: ConfigOptions = {};
 
 export interface EditorContextStore {
   configOptions: ConfigOptions;
-  clippingsUpdatedAt: string;
+  annotationsUpdatedAt: string;
+  annotations: any;
 }
 
 interface EditorAction {
   type: string;
   configOptions: ConfigOptions;
-  clippingsUpdatedAt: string;
+  annotationsUpdatedAt: string;
+  annotations: any;
 }
 
 export const defaultState: EditorContextStore = {
   configOptions: defaultConfigOptions,
-  clippingsUpdatedAt: "",
+  annotationsUpdatedAt: "",
+  annotations: [],
 };
 
 const EditorStateContext =
@@ -38,10 +41,16 @@ function EditorReducer(state: EditorContextStore, action: EditorAction) {
         },
       };
     }
-    case "updateClippingsUpdatedAt": {
+    case "annotationsUpdatedAt": {
       return {
         ...state,
-        clippingsUpdatedAt: action.clippingsUpdatedAt,
+        annotationsUpdatedAt: action.annotationsUpdatedAt,
+      };
+    }
+    case "updateAnnotations": {
+      return {
+        ...state,
+        annotations: action.annotations,
       };
     }
     default: {

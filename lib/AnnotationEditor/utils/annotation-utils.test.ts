@@ -2,7 +2,6 @@ import { describe, it, expect, afterEach } from "vitest";
 import {
   AnnotationForEditor,
   AnnotationFromAnnotorious,
-  AnnotationPageForEditor,
   AnnotationForAnnotorious,
 } from "../types/annotation";
 
@@ -12,7 +11,7 @@ import {
   updateAnnotation,
   fetchAnnotations,
   convertWebAnnotationToIIIFAnnotation,
-  convertIIIFAnnotationPageToWebAnnotations,
+  convertIIIFAnnotationToWebAnnotation,
 } from "./annotation-utils";
 
 const webAnnotation1: AnnotationFromAnnotorious = {
@@ -189,17 +188,6 @@ const annotationNoBody = (
       type: "SpecificResource",
     },
     id: "123abc",
-  };
-};
-
-const annotationPage = (
-  annotations: AnnotationForEditor[],
-): AnnotationPageForEditor => {
-  return {
-    "@context": "http://iiif.io/api/presentation/3/context.json",
-    id: "http://localhost:3000/api/annotationsByCanvas/1?action=GET",
-    type: "AnnotationPage",
-    items: annotations,
   };
 };
 
@@ -650,16 +638,17 @@ describe("updateAnnotation with guest user", () => {
 });
 
 describe("fetchAnnotations with guest user", () => {
+  const url = "http://example.com";
+  const token = undefined;
+
   it("returns empty array if no saved annotations", async () => {
-    const canvas = "canvas1";
-
-    const res = await fetchAnnotations(canvas, unit);
+    const res = await fetchAnnotations(token, url);
 
     const expected: any = [];
     expect(res).toStrictEqual(expected);
   });
 
-  it("returns web annotations for a given canvas", async () => {
+  it("returns all annotations", async () => {
     const canvas = "canvas1";
     const manifest = "manifest";
     localStorage.setItem(
@@ -673,42 +662,9 @@ describe("fetchAnnotations with guest user", () => {
       }),
     );
 
-    const res = await fetchAnnotations(canvas, unit);
+    const res = await fetchAnnotations(token, url);
 
-    const expected = [
-      {
-        ...webAnnotation1,
-        target: {
-          ...webAnnotation1.target,
-          source: {
-            id: canvas,
-            partOf: [{ id: manifest, type: "Manifest" }],
-            type: "Canvas",
-          },
-        },
-      },
-    ];
-    expect(res).toStrictEqual(expected);
-  });
-
-  it("returns empty array if canvas does not match saved annotation", async () => {
-    const canvas = "canvas1";
-    const canvas2 = "canvas2";
-    const manifest = "manifest";
-    localStorage.setItem(
-      "annotations",
-      JSON.stringify({
-        [canvas]: {
-          id: canvas,
-          items: [annotation1(manifest, canvas)],
-          type: "AnnotationPage",
-        },
-      }),
-    );
-
-    const res = await fetchAnnotations(canvas2, unit);
-
-    const expected: any = [];
+    const expected = [annotation1(manifest, canvas)];
     expect(res).toStrictEqual(expected);
   });
 
@@ -726,21 +682,9 @@ describe("fetchAnnotations with guest user", () => {
       }),
     );
 
-    const res = await fetchAnnotations(canvas, unit);
+    const res = await fetchAnnotations(token, url);
 
-    const expected = [
-      {
-        ...webAnnotationMultipleBodies,
-        target: {
-          ...webAnnotationMultipleBodies.target,
-          source: {
-            id: canvas,
-            partOf: [{ id: manifest, type: "Manifest" }],
-            type: "Canvas",
-          },
-        },
-      },
-    ];
+    const expected = [annotationMultipleBodies(manifest, canvas)];
     expect(res).toStrictEqual(expected);
   });
 });
@@ -791,175 +735,106 @@ describe("convertWebAnnotationToIIIFAnnotation", () => {
   });
 });
 
-describe("convertIIIFAnnotationPageToWebAnnotations", () => {
-  it("converts annotation page to format compatible with Annotorious", () => {
+describe("convertIIIFAnnotationToWebAnnotation", () => {
+  it("converts annotation to format compatible with Annotorious", () => {
     const canvas = "canvas1";
     const manifest = "manifest";
 
-    const annotations = annotationPage([annotation1(manifest, canvas)]);
-    const res = convertIIIFAnnotationPageToWebAnnotations(annotations, unit);
+    const annotation = annotation1(manifest, canvas);
+    const res = convertIIIFAnnotationToWebAnnotation(annotation, unit);
 
-    const expected: AnnotationForAnnotorious[] = [
-      {
-        "@context": "http://www.w3.org/ns/anno.jsonld",
-        type: "Annotation",
-        body: [{ type: "TextualBody", value: "first", purpose: "commenting" }],
-        target: {
-          source: {
-            id: canvas,
-            type: "Canvas",
-            partOf: [
-              {
-                id: manifest,
-                type: "Manifest",
-              },
-            ],
-          },
-          selector: {
-            type: "FragmentSelector",
-            conformsTo: "http://www.w3.org/TR/media-frags/",
-            value: "xywh=pixel:10,20,30,40",
-          },
+    const expected: AnnotationForAnnotorious = {
+      "@context": "http://www.w3.org/ns/anno.jsonld",
+      type: "Annotation",
+      body: [{ type: "TextualBody", value: "first", purpose: "commenting" }],
+      target: {
+        source: {
+          id: canvas,
+          type: "Canvas",
+          partOf: [
+            {
+              id: manifest,
+              type: "Manifest",
+            },
+          ],
         },
-        id: "123abc",
+        selector: {
+          type: "FragmentSelector",
+          conformsTo: "http://www.w3.org/TR/media-frags/",
+          value: "xywh=pixel:10,20,30,40",
+        },
       },
-    ];
+      id: "123abc",
+    };
     expect(res).toStrictEqual(expected);
   });
 
-  it("handles annotation page with multiple annotations", () => {
+  it("handles annotation with multiple bodies", () => {
     const canvas = "canvas1";
     const manifest = "manifest";
 
-    const annotations = annotationPage([
-      annotation1(manifest, canvas),
-      annotation2(manifest, canvas),
-    ]);
-    const res = convertIIIFAnnotationPageToWebAnnotations(annotations, unit);
+    const annotation = annotationMultipleBodies(manifest, canvas);
+    const res = convertIIIFAnnotationToWebAnnotation(annotation, unit);
 
-    const expected: AnnotationForAnnotorious[] = [
-      {
-        "@context": "http://www.w3.org/ns/anno.jsonld",
-        type: "Annotation",
-        body: [{ type: "TextualBody", value: "first", purpose: "commenting" }],
-        target: {
-          source: {
-            id: canvas,
-            type: "Canvas",
-            partOf: [
-              {
-                id: manifest,
-                type: "Manifest",
-              },
-            ],
-          },
-          selector: {
-            type: "FragmentSelector",
-            conformsTo: "http://www.w3.org/TR/media-frags/",
-            value: "xywh=pixel:10,20,30,40",
-          },
+    const expected: AnnotationForAnnotorious = {
+      "@context": "http://www.w3.org/ns/anno.jsonld",
+      type: "Annotation",
+      body: [
+        { type: "TextualBody", value: "second b", purpose: "commenting" },
+        { type: "TextualBody", value: "second c", purpose: "commenting" },
+      ],
+      target: {
+        source: {
+          id: canvas,
+          type: "Canvas",
+          partOf: [
+            {
+              id: manifest,
+              type: "Manifest",
+            },
+          ],
         },
-        id: "123abc",
-      },
-      {
-        "@context": "http://www.w3.org/ns/anno.jsonld",
-        type: "Annotation",
-        body: [{ type: "TextualBody", value: "second", purpose: "commenting" }],
-        target: {
-          source: {
-            id: canvas,
-            type: "Canvas",
-            partOf: [
-              {
-                id: manifest,
-                type: "Manifest",
-              },
-            ],
-          },
-          selector: {
-            type: "FragmentSelector",
-            conformsTo: "http://www.w3.org/TR/media-frags/",
-            value: "xywh=pixel:15,25,35,45",
-          },
+        selector: {
+          type: "FragmentSelector",
+          conformsTo: "http://www.w3.org/TR/media-frags/",
+          value: "xywh=pixel:10,20,30,40",
         },
-        id: "456def",
       },
-    ];
+      id: "123abc",
+    };
     expect(res).toStrictEqual(expected);
   });
 
-  it("handles annotation page with annotation with multiple bodies", () => {
+  it("handles annotation with no body", () => {
     const canvas = "canvas1";
     const manifest = "manifest";
 
-    const annotations = annotationPage([
-      annotationMultipleBodies(manifest, canvas),
-    ]);
-    const res = convertIIIFAnnotationPageToWebAnnotations(annotations, unit);
+    const annotation = annotationNoBody(manifest, canvas);
+    const res = convertIIIFAnnotationToWebAnnotation(annotation, unit);
 
-    const expected: AnnotationForAnnotorious[] = [
-      {
-        "@context": "http://www.w3.org/ns/anno.jsonld",
-        type: "Annotation",
-        body: [
-          { type: "TextualBody", value: "second b", purpose: "commenting" },
-          { type: "TextualBody", value: "second c", purpose: "commenting" },
-        ],
-        target: {
-          source: {
-            id: canvas,
-            type: "Canvas",
-            partOf: [
-              {
-                id: manifest,
-                type: "Manifest",
-              },
-            ],
-          },
-          selector: {
-            type: "FragmentSelector",
-            conformsTo: "http://www.w3.org/TR/media-frags/",
-            value: "xywh=pixel:10,20,30,40",
-          },
+    const expected: AnnotationForAnnotorious = {
+      "@context": "http://www.w3.org/ns/anno.jsonld",
+      type: "Annotation",
+      body: [],
+      target: {
+        source: {
+          id: canvas,
+          type: "Canvas",
+          partOf: [
+            {
+              id: manifest,
+              type: "Manifest",
+            },
+          ],
         },
-        id: "123abc",
-      },
-    ];
-    expect(res).toStrictEqual(expected);
-  });
-
-  it("handles annotation page with annotation with no body", () => {
-    const canvas = "canvas1";
-    const manifest = "manifest";
-
-    const annotations = annotationPage([annotationNoBody(manifest, canvas)]);
-    const res = convertIIIFAnnotationPageToWebAnnotations(annotations, unit);
-
-    const expected: AnnotationForAnnotorious[] = [
-      {
-        "@context": "http://www.w3.org/ns/anno.jsonld",
-        type: "Annotation",
-        body: [],
-        target: {
-          source: {
-            id: canvas,
-            type: "Canvas",
-            partOf: [
-              {
-                id: manifest,
-                type: "Manifest",
-              },
-            ],
-          },
-          selector: {
-            type: "FragmentSelector",
-            conformsTo: "http://www.w3.org/TR/media-frags/",
-            value: "xywh=pixel:10,20,30,40",
-          },
+        selector: {
+          type: "FragmentSelector",
+          conformsTo: "http://www.w3.org/TR/media-frags/",
+          value: "xywh=pixel:10,20,30,40",
         },
-        id: "123abc",
       },
-    ];
+      id: "123abc",
+    };
     expect(res).toStrictEqual(expected);
   });
 });

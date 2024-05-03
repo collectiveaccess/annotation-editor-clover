@@ -6,39 +6,38 @@ import {
 } from "../lib/main";
 
 function App() {
-  const url = "http://localhost:3000";
+  const base_url = "http://localhost:3000";
+  const annotationServer = `${base_url}/api/annotations/1`;
+  const token = "123abc";
 
   return (
     <>
       <EditorProvider>
         <Viewer
-          iiifContent={`${url}/api/newspaper/collection`}
-          iiifContentSearch={`${url}/api/newspaper_search/1?q=Berliner`}
+          iiifContent={`${base_url}/api/fixtures/newspaper/issue_1`}
+          iiifContentSearchQuery={{ q: "Berliner" }}
           plugins={[
             {
               id: "AnnotationEditor",
-              menu: {
-                component: AnnotationEditor,
-                componentProps: {
-                  annotationServer: `${url}/api/annotationsByCanvas/1`,
-                  token: "123abc",
+              imageViewer: {
+                menu: {
+                  component: AnnotationEditor,
+                  componentProps: {
+                    annotationServer: annotationServer,
+                    token: token,
+                  },
                 },
               },
               informationPanel: {
                 component: InformationPanel,
-                label: { none: ["Clippings"] },
+                label: { none: ["Clippins"] },
                 componentProps: {
-                  annotationServer: `${url}/api/annotations/1`,
-                  token: "123abc",
+                  annotationServer: annotationServer,
+                  token: token,
                 },
               },
             },
           ]}
-          options={{
-            ignoreAnnotationOverlaysLabels: ["Clippings"],
-            informationPanel: { open: true, renderAbout: false },
-            canvasHeight: "640px",
-          }}
         />
       </EditorProvider>
     </>

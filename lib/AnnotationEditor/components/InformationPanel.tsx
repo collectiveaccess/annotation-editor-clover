@@ -4,9 +4,13 @@ import {
   type AnnotationTargetExtended,
 } from "@samvera/clover-iiif";
 import styles from "./InformationPanel.module.css";
-import { useEditorState } from "../context/annotation-editor-context";
+import {
+  useEditorState,
+  useEditorDispatch,
+} from "../context/annotation-editor-context";
 import AnnotationItem from "./AnnotationItem";
 import { AnnotationForEditor } from "../types/annotation";
+import { fetchAnnotations } from "../utils/annotation-utils";
 
 interface PropType extends PluginInformationPanel {
   token: string;
@@ -15,7 +19,6 @@ interface PropType extends PluginInformationPanel {
 }
 
 export const InfomationPanel: React.FC<PropType> = ({
-  annotations,
   activeManifest,
   canvas,
   viewerConfigOptions,
@@ -28,42 +31,24 @@ export const InfomationPanel: React.FC<PropType> = ({
   const [activeTarget, setActiveTarget] = useState<
     AnnotationTargetExtended | string
   >();
-  const [clippings, setClippings] = useState(annotations);
 
   const editorState = useEditorState();
-  const { clippingsUpdatedAt } = editorState;
+  const { annotationsUpdatedAt, annotations } = editorState;
+  const dispatch: any = useEditorDispatch();
 
-  // fetch clippings on page load. use plugin to fetch token since Clover isn't
-  // set up to use tokens for the vault.get
+  // fetch annotations when there is a change in annotationsUpdatedAt
   useEffect(() => {
-    fetch(annotationServer, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((newAnnotations) => {
-        setClippings(newAnnotations.items);
-      });
-  }, []);
+    if (!annotationsUpdatedAt) return;
 
-  // fetch clippings when there is a change in the clippings
-  useEffect(() => {
-    if (!clippingsUpdatedAt) return;
-
-    fetch(annotationServer, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((newAnnotations) => {
-        setClippings(newAnnotations.items);
+    fetchAnnotations(token, annotationServer).then((response) => {
+      console.log("InfomationPanel fetchAnnotations", response);
+      dispatch({
+        type: "updateAnnotations",
+        annotations: response,
       });
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clippingsUpdatedAt]);
+  }, [annotationsUpdatedAt]);
 
   return (
     <div className={styles.container}>
@@ -75,10 +60,11 @@ export const InfomationPanel: React.FC<PropType> = ({
         <a href="">View all clippings.</a>
       </p>
       <p>Clippings from this record</p>
-      {clippings?.map((clipping) => (
+
+      {annotations?.map((annotation) => (
         <AnnotationItem
-          key={clipping.id}
-          annotation={clipping}
+          key={annotation.id}
+          annotation={annotation}
           activeManifest={activeManifest}
           canvas={canvas}
           viewerConfigOptions={viewerConfigOptions}

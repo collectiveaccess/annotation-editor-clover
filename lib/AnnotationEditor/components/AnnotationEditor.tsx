@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Annotorious from "@recogito/annotorious-openseadragon";
 import "@recogito/annotorious-openseadragon/dist/annotorious.min.css";
 import {
   saveAnnotation,
-  fetchAnnotations,
   deleteAnnotation,
   updateAnnotation,
+  convertIIIFAnnotationToWebAnnotation,
 } from "../utils/annotation-utils";
 import { type Plugin } from "@samvera/clover-iiif";
-import { useEditorDispatch } from "../context/annotation-editor-context";
+import {
+  useEditorDispatch,
+  useEditorState,
+} from "../context/annotation-editor-context";
 import styles from "./AnnotationEditor.module.css";
 import { AnnotationFromAnnotorious } from "../types/annotation";
+import { fetchAnnotations } from "../utils/annotation-utils";
 
 interface PropType extends Plugin {
   token?: string;
@@ -29,13 +33,35 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
   const [active, setActive] = useState(false);
   const [editor, setEditor] = useState<any>();
   const editorDispatch: any = useEditorDispatch();
+  const editorState = useEditorState();
+  const { annotations } = editorState;
 
   const activeCanvas = canvas.id;
   const fragmentUnit = "pixel";
+  const fetchAnnotationRan = useRef(false);
+
+  // fetch annotations
+  useEffect(() => {
+    if (!fetchAnnotationRan.current) {
+      fetchAnnotations(token, annotationServer).then((response) => {
+        console.log("AnnotationEditor fetch annotations", editor);
+
+        editorDispatch({
+          type: "updateAnnotations",
+          annotations: response,
+        });
+      });
+    }
+
+    return () => {
+      fetchAnnotationRan.current = true;
+    };
+  }, []);
 
   // create Annotorious instance for each openSeadragonViewer instance
   useEffect(() => {
     if (!openSeadragonViewer) return;
+    console.log("set up Annotorious");
 
     // set up Annotorious
     const options = {
@@ -43,86 +69,95 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
       fragmentUnit: fragmentUnit,
       widgets: ["COMMENT"],
     };
-    const anno = Annotorious(openSeadragonViewer, options);
+    const annotoriousInstance = Annotorious(openSeadragonViewer, options);
 
     // set up CRUD
-    anno.on("createAnnotation", (annotation: AnnotationFromAnnotorious) => {
-      saveAnnotation(
-        annotation,
-        activeManifest,
-        canvas.id,
-        fragmentUnit,
-        token,
-        annotationServer,
-      ).then(() => {
-        editorDispatch({
-          type: "updateClippingsUpdatedAt",
-          clippingsUpdatedAt: new Date().getTime(),
+    annotoriousInstance.on(
+      "createAnnotation",
+      (annotation: AnnotationFromAnnotorious) => {
+        saveAnnotation(
+          annotation,
+          activeManifest,
+          canvas.id,
+          fragmentUnit,
+          token,
+          annotationServer,
+        ).then(() => {
+          editorDispatch({
+            type: "annotationsUpdatedAt",
+            annotationsUpdatedAt: new Date().getTime(),
+          });
         });
-      });
-    });
-    anno.on("updateAnnotation", (annotation: AnnotationFromAnnotorious) => {
-      updateAnnotation(
-        annotation,
-        activeManifest,
-        activeCanvas,
-        fragmentUnit,
-        token,
-        annotationServer,
-      ).then(() => {
-        editorDispatch({
-          type: "updateClippingsUpdatedAt",
-          clippingsUpdatedAt: new Date().getTime(),
+      },
+    );
+    annotoriousInstance.on(
+      "updateAnnotation",
+      (annotation: AnnotationFromAnnotorious) => {
+        updateAnnotation(
+          annotation,
+          activeManifest,
+          activeCanvas,
+          fragmentUnit,
+          token,
+          annotationServer,
+        ).then(() => {
+          editorDispatch({
+            type: "annotationsUpdatedAt",
+            annotationsUpdatedAt: new Date().getTime(),
+          });
         });
-      });
-    });
-    anno.on("deleteAnnotation", (annotation: AnnotationFromAnnotorious) => {
-      deleteAnnotation(
-        annotation,
-        activeManifest,
-        activeCanvas,
-        fragmentUnit,
-        token,
-        annotationServer,
-      ).then(() => {
-        editorDispatch({
-          type: "updateClippingsUpdatedAt",
-          clippingsUpdatedAt: new Date().getTime(),
+      },
+    );
+    annotoriousInstance.on(
+      "deleteAnnotation",
+      (annotation: AnnotationFromAnnotorious) => {
+        deleteAnnotation(
+          annotation,
+          activeManifest,
+          activeCanvas,
+          fragmentUnit,
+          token,
+          annotationServer,
+        ).then(() => {
+          editorDispatch({
+            type: "annotationsUpdatedAt",
+            annotationsUpdatedAt: new Date().getTime(),
+          });
         });
-      });
-    });
+      },
+    );
 
     // set menu button to inactive after drawing selectionbox
-    anno.on("createSelection", () => {
+    annotoriousInstance.on("createSelection", () => {
       setActive(false);
     });
-    setEditor(anno);
-
-    // load saved clippings
-    (async () => {
-      const savedAnnotations = await fetchAnnotations(
-        activeCanvas,
-        fragmentUnit,
-        token,
-        annotationServer,
-      );
-
-      savedAnnotations.forEach((annotation) => {
-        try {
-          anno.addAnnotation(annotation);
-        } catch (error) {
-          console.log(error);
-        }
-      });
-    })();
+    setEditor(annotoriousInstance);
 
     // destroy Annotorious instance
     return () => {
-      anno.destroy();
+      annotoriousInstance.destroy();
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openSeadragonViewer]);
+
+  // add annotations to annotorious
+  useEffect(() => {
+    if (editor && annotations.length > 0) {
+      console.log("annotorious.addAnnotation()");
+      annotations.forEach((annotation) => {
+        try {
+          if (annotation.target.source.id === activeCanvas) {
+            editor.addAnnotation(
+              convertIIIFAnnotationToWebAnnotation(annotation, "pixel"),
+            );
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    }
+  }, [annotations, editor, activeCanvas]);
 
   function clickHandler() {
     editor.setDrawingTool("rect");
