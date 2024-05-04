@@ -21,45 +21,41 @@ import {
 } from "annotation-editor-clover";
 
 function App() {
-  const url = "http://localhost:3000";
+  const base_url = "http://localhost:3000";
+  const iiifContent = `${base_url}/api/fixtures/newspaper/issue_1`;
+  const annotationServer = `${base_url}/api/annotations/1`;
+  const token = "123abc";
 
   return (
-    <>
-      <EditorProvider>
-        <Viewer
-          // manifest for the object
-          iiifContent={`${url}/api/newspaper/issue_1`}
-          plugins={[
-            {
-              id: "AnnotationEditor",
-              // add button to menu bar that activates Annotorious
-              imageViewer: {
-                menu: {
-                  component: AnnotationEditor,
-                  componentProps: {
-                    annotationServer: `${url}/api/annotationsByCanvas/1`,
-                    token: "123abc",
-                  },
-                },
-              },
-              // displays the clipping in the side information panel
-              informationPanel: {
-                component: InformationPanel,
-                label: { none: ["Clippings"] },
+    <EditorProvider>
+      <Viewer
+        iiifContent={iiifContent}
+        plugins={[
+          {
+            id: "AnnotationEditor",
+            imageViewer: {
+              menu: {
+                component: AnnotationEditor,
                 componentProps: {
-                  annotationServer: `${url}/api/annotations/1`,
-                  token: "123abc",
+                  annotationServer: annotationServer,
+                  token: token,
                 },
               },
             },
-          ]}
-        />
-      </EditorProvider>
-    </>
+            informationPanel: {
+              component: InformationPanel,
+              label: { none: ["Clippins"] },
+              componentProps: {
+                annotationServer: annotationServer,
+                token: token,
+              },
+            },
+          },
+        ]}
+      />
+    </EditorProvider>
   );
 }
-
-export default App;
 ```
 
 ## Clover developers: update Annotation editor plugin
