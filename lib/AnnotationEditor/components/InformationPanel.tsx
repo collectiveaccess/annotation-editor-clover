@@ -52,13 +52,9 @@ export const InfomationPanel: React.FC<PropType> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [annotationsUpdatedAt]);
 
-  return (annotations?.length === 0) ? 
-  	( <div className={styles.container}>
-  		No clippings defined
-  	  </div>
-  	)
-  	:
-  	(
+  return annotations?.length === 0 ? (
+    <div className={styles.container}>No clippings defined</div>
+  ) : (
     <div className={styles.container}>
       {annotations?.map((annotation: any) => (
         <AnnotationItem
