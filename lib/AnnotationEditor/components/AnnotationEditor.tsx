@@ -44,7 +44,6 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
   // fetch annotations on page load
   useEffect(() => {
     if (!fetchAnnotationRan.current && annotations.length === 0) {
-
       fetchAnnotations(token, annotationServer).then((response) => {
         editorDispatch({
           type: "updateAnnotations",
@@ -63,7 +62,6 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
   useEffect(() => {
     if (!openSeadragonViewer) return;
     if (openSeadragonViewer.id == viewerId) return;
-
 
     // set up Annotorious
     const options = {
