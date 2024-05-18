@@ -139,7 +139,7 @@ const AnnotationItem: React.FC<PropType> = ({
 
   return (
     <div className="clipping" onClick={handleClick}>
-      {processBody(annotation.body)}
+      <button>{processBody(annotation.body)}</button>
     </div>
   );
 };

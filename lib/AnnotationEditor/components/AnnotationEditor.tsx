@@ -150,7 +150,7 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
   // add annotations for current canvas to annotorious
   useEffect(() => {
     if (annotorious && annotations.length > 0) {
-      annotations.forEach((annotation) => {
+      annotations.forEach((annotation: any) => {
         try {
           if (annotation.target.source.id === activeCanvas) {
             annotorious.addAnnotation(
