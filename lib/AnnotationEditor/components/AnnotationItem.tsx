@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
-import { createOpenSeadragonRect } from "@samvera/clover-iiif/openseadragon-helpers";
-import { parseAnnotationTarget } from "@samvera/clover-iiif/annotation-helpers";
+import {
+  createOpenSeadragonRect,
+  parseAnnotationTarget,
+} from "@samvera/clover-iiif/helpers";
 import {
   type PluginInformationPanel,
   type AnnotationTargetExtended,
