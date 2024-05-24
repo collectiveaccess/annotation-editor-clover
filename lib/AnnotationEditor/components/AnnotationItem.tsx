@@ -22,7 +22,6 @@ interface PropType extends PluginInformationPanel {
 const AnnotationItem: React.FC<PropType> = ({
   annotation,
   canvas,
-  openSeadragonViewer,
   useViewerDispatch,
   setActiveTarget,
   activeTarget,
@@ -30,7 +29,7 @@ const AnnotationItem: React.FC<PropType> = ({
 }) => {
   const dispatch: any = useViewerDispatch();
   const viewerState = useViewerState();
-  const { OSDImageLoaded } = viewerState;
+  const { OSDImageLoaded, openSeadragonViewer } = viewerState;
   const editorState = useEditorState();
   const { zoomLevel } = editorState;
 

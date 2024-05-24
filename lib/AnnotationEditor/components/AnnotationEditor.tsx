@@ -22,13 +22,10 @@ interface PropType extends Plugin {
 }
 
 const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
-  const {
-    canvas,
-    openSeadragonViewer,
-    activeManifest,
-    token,
-    annotationServer,
-  } = props;
+  const { canvas, useViewerState, token, annotationServer } = props;
+
+  const viewerState = useViewerState();
+  const { openSeadragonViewer, activeManifest } = viewerState;
 
   const [active, setActive] = useState(false);
   const [viewerId, setViewerId] = useState(openSeadragonViewer?.id);

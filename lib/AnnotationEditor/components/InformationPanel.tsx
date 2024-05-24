@@ -17,10 +17,7 @@ interface PropType extends PluginInformationPanel {
 }
 
 export const InfomationPanel: React.FC<PropType> = ({
-  activeManifest,
   canvas,
-  viewerConfigOptions,
-  openSeadragonViewer,
   useViewerDispatch,
   useViewerState,
   token,
@@ -60,10 +57,7 @@ export const InfomationPanel: React.FC<PropType> = ({
         <AnnotationItem
           key={annotation.id}
           annotation={annotation}
-          activeManifest={activeManifest}
           canvas={canvas}
-          viewerConfigOptions={viewerConfigOptions}
-          openSeadragonViewer={openSeadragonViewer}
           useViewerState={useViewerState}
           useViewerDispatch={useViewerDispatch}
           activeTarget={activeTarget}
