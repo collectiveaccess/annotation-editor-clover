@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "@recogito/annotorious-openseadragon": "^2.7.17",
-    "@samvera/clover-iiif": "github:wykhuh/clover-iiif#feature/search-and-clipping-dist",
+    "@samvera/clover-iiif": "github:samvera-labs/clover-iiif",
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.1",
     "@types/node": "^20.11.25",
