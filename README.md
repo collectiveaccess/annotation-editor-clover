@@ -34,7 +34,7 @@ function App() {
           {
             id: "AnnotationEditor",
             imageViewer: {
-              menu: {
+              controls: {
                 component: AnnotationEditor,
                 componentProps: {
                   annotationServer: annotationServer,
