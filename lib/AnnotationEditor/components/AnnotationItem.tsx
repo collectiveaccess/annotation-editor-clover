@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
-import { createOpenSeadragonRect } from "@samvera/clover-iiif/openseadragon-helpers";
-import { parseAnnotationTarget } from "@samvera/clover-iiif/annotation-helpers";
+import {
+  createOpenSeadragonRect,
+  parseAnnotationTarget,
+} from "@samvera/clover-iiif/helpers";
 import {
   type PluginInformationPanel,
   type AnnotationTargetExtended,
@@ -30,9 +32,7 @@ interface PropType extends PluginInformationPanel {
 const AnnotationItem: React.FC<PropType> = ({
   annotation,
   canvas,
-  openSeadragonViewer,
   useViewerDispatch,
-  activeManifest,
   setActiveTarget,
   activeTarget,
   useViewerState,
@@ -41,7 +41,7 @@ const AnnotationItem: React.FC<PropType> = ({
 }) => {
   const dispatch: any = useViewerDispatch();
   const viewerState = useViewerState();
-  const { OSDImageLoaded } = viewerState;
+  const { OSDImageLoaded, openSeadragonViewer, activeManifest } = viewerState;
   const editorState = useEditorState();
   const { zoomLevel, annotorious } = editorState;
   
