@@ -31,7 +31,7 @@ function App() {
             },
             informationPanel: {
               component: InformationPanel,
-              label: { none: ["Clippins"] },
+              label: { none: ["Clippings"] },
               componentProps: {
                 annotationServer: annotationServer,
                 token: token,
