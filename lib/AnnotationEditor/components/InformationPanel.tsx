@@ -14,6 +14,8 @@ import { fetchAnnotations } from "../utils/annotation-utils";
 interface PropType extends PluginInformationPanel {
   token: string;
   annotationServer: string;
+  annotationDownloadUrl: string;
+  annotationDownloadLabel: string;
 }
 
 export const InfomationPanel: React.FC<PropType> = ({
@@ -25,13 +27,14 @@ export const InfomationPanel: React.FC<PropType> = ({
   useViewerState,
   token,
   annotationServer,
+  annotationDownloadUrl,
+  annotationDownloadLabel
 }) => {
   const [activeTarget, setActiveTarget] = useState<
     AnnotationTargetExtended | string
   >();
-
   const editorState = useEditorState();
-  const { annotationsUpdatedAt, annotations } = editorState;
+  const { annotationsUpdatedAt, annotations, annotorious } = editorState;
   const dispatch: any = useEditorDispatch();
 
   // fetch annotations when there is a change in annotationsUpdatedAt
@@ -39,7 +42,7 @@ export const InfomationPanel: React.FC<PropType> = ({
     if (!annotationsUpdatedAt) return;
 
     fetchAnnotations(token, annotationServer).then((response) => {
-      console.log("InfomationPanel fetchAnnotations", response);
+      console.log("InfomationPanel fetchAnnotations", response, annotationsUpdatedAt);
       dispatch({
         type: "updateAnnotations",
         annotations: response,
@@ -48,10 +51,16 @@ export const InfomationPanel: React.FC<PropType> = ({
         type: "annotationsUpdatedAt",
         annotationsUpdatedAt: undefined,
       });
+       dispatch({
+        type: "updateAnnotorious",
+        annotorious: annotorious,
+      });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [annotationsUpdatedAt]);
 
+  const msg = (annotationDownloadUrl && annotationDownloadLabel) ? <form action={annotationDownloadUrl} className="clippingDownload"><button className="clippingDownloadLink">{annotationDownloadLabel}</button></form> : '';
+  
   return (annotations?.length === 0) ? 
   	( <div className={styles.container}>
   		No clippings defined
@@ -60,6 +69,7 @@ export const InfomationPanel: React.FC<PropType> = ({
   	:
   	(
     <div className={styles.container}>
+    	{msg}
       {annotations?.map((annotation: any) => (
         <AnnotationItem
           key={annotation.id}
@@ -72,6 +82,8 @@ export const InfomationPanel: React.FC<PropType> = ({
           useViewerDispatch={useViewerDispatch}
           activeTarget={activeTarget}
           setActiveTarget={setActiveTarget}
+          token={token}
+          annotationServer={annotationServer}
         />
       ))}
     </div>

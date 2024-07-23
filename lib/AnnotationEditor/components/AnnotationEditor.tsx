@@ -68,6 +68,16 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
       allowEmpty: true,
       fragmentUnit: fragmentUnit,
       widgets: ["COMMENT"],
+      messages: {
+		  "Add a comment...": "Notes",
+		  "Add a reply...": "Notes",
+		  "Add tag...": "Tags",
+		  "Cancel": "Cancel",
+		  "Close": "Close",
+		  "Edit": "Edit",
+		  "Delete": "Delete",
+		  "Ok": "Ok"
+		}
     };
     const annotoriousInstance = Annotorious(openSeadragonViewer, options);
 
@@ -130,6 +140,7 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
     // set menu button to inactive after drawing selectionbox
     annotoriousInstance.on("createSelection", () => {
       setActive(false);
+      document.body.style.cursor = 'auto';
     });
 
     editorDispatch({
@@ -140,7 +151,6 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
 
     // destroy Annotorious instance
     return () => {
-      console.log("annotoriousInstance.destroy");
       annotoriousInstance.destroy();
     };
 
@@ -170,6 +180,7 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
     annotorious.setDrawingTool("rect");
     annotorious.setDrawingEnabled(!active);
     setActive(!active);
+	document.body.style.cursor = 'crosshair';
   }
 
   if (!annotorious) return <></>;

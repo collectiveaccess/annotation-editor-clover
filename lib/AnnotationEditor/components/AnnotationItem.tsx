@@ -9,7 +9,13 @@ import {
   AnnotationForEditor,
   AnnotationBodyForEditor,
 } from "../types/annotation";
-import { useEditorState } from "../context/annotation-editor-context";
+import { useEditorDispatch, useEditorState } from "../context/annotation-editor-context";
+import {
+  deleteAnnotationItem,
+  convertIIIFAnnotationToWebAnnotation
+} from "../utils/annotation-utils";
+
+import { deleteIcon } from "../utils/annotation-icons";
 
 interface PropType extends PluginInformationPanel {
   annotation: AnnotationForEditor;
@@ -17,6 +23,8 @@ interface PropType extends PluginInformationPanel {
     React.SetStateAction<AnnotationTargetExtended | string | undefined>
   >;
   activeTarget?: AnnotationTargetExtended | string;
+  token?: string;
+  annotationServer?: string;
 }
 
 const AnnotationItem: React.FC<PropType> = ({
@@ -24,15 +32,20 @@ const AnnotationItem: React.FC<PropType> = ({
   canvas,
   openSeadragonViewer,
   useViewerDispatch,
+  activeManifest,
   setActiveTarget,
   activeTarget,
   useViewerState,
+  annotationServer,
+  token,
 }) => {
   const dispatch: any = useViewerDispatch();
   const viewerState = useViewerState();
   const { OSDImageLoaded } = viewerState;
   const editorState = useEditorState();
-  const { zoomLevel } = editorState;
+  const { zoomLevel, annotorious } = editorState;
+  
+  const editorDispatch: any = useEditorDispatch();
 
   // zoom to activeTarget when openSeadragonViewer changes
   useEffect(() => {
@@ -92,6 +105,26 @@ const AnnotationItem: React.FC<PropType> = ({
       }
     }
   }
+  
+  function handleDelete() {
+    if (!annotation.target) return;
+    
+  	 deleteAnnotationItem(
+          convertIIIFAnnotationToWebAnnotation(annotation, "pixel"),
+          activeManifest,
+          canvas.id,
+          "pixel",
+          token,
+          annotationServer,
+        ).then(() => {
+          editorDispatch({
+            type: "annotationsUpdatedAt",
+            annotationsUpdatedAt: new Date().getTime(),
+          });
+          
+    	  annotorious.clearAnnotations();
+        });
+  }
 
   function highlightAnnotation(annotation: AnnotationForEditor) {
     const allAnnotationEls = document.querySelectorAll(".a9s-annotation");
@@ -138,8 +171,9 @@ const AnnotationItem: React.FC<PropType> = ({
   if (!annotation.body) return <></>;
 
   return (
-    <div className="clipping" onClick={handleClick}>
-      <button>{processBody(annotation.body)}</button>
+    <div className="clipping" style={{position: 'relative'}}>
+      <button onClick={handleClick}>{processBody(annotation.body)}</button>
+      <button onClick={handleDelete}  style={{position: 'absolute', right: '5px', bottom: '5px', width: '24px'}}>{deleteIcon()}</button>
     </div>
   );
 };

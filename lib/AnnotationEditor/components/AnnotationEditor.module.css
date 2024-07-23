@@ -15,7 +15,7 @@
 }
 
 .toolbarBtn:hover {
-  background-color: hsl(209 100% 38.2%);
+  background-color: rgb(61, 90, 109);
 }
 
 .toolbarBtn svg {
@@ -38,5 +38,6 @@
 }
 
 .active {
-  background-color: hsl(209 100% 38.2%);
+  /* background-color: hsl(209 100% 38.2%); */
+  background-color: rgb(61, 90, 109);
 }

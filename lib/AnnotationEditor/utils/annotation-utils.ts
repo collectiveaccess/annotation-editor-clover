@@ -157,6 +157,45 @@ export async function deleteAnnotation(
   }
 }
 
+export async function deleteAnnotationItem(
+  webAnnotation: AnnotationForAnnotorious,
+  manifestId: string,
+  activeCanvas: string,
+  unit: "pixel" | "percent",
+  token?: string,
+  annotationServer?: string,
+): Promise<void> {
+  if (token && annotationServer) {
+    await fetch(annotationServer, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        annotation: webAnnotation, unit: unit, manifestId: manifestId
+      }),
+    });
+  } else if (!token) {
+    const savedAnnotations = window.localStorage.getItem("annotations");
+    if (savedAnnotations) {
+      const annotations = JSON.parse(savedAnnotations);
+      const selectedAnnotations = annotations[activeCanvas];
+      if (selectedAnnotations) {
+        const otherAnnotations = selectedAnnotations.items.filter(
+          (ann: any) => ann.id !== webAnnotation.id,
+        );
+        annotations[activeCanvas] = {
+          id: activeCanvas,
+          items: otherAnnotations,
+          type: "AnnotationPage",
+        };
+        window.localStorage.setItem("annotations", JSON.stringify(annotations));
+      }
+    }
+  }
+}
+
 export async function updateAnnotation(
   webAnnotation: AnnotationFromAnnotorious,
   manifestId: string,
