@@ -21,19 +21,22 @@ interface PropType extends Plugin {
   annotationServer?: string;
 }
 
-const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
-  const { canvas, useViewerState, token, annotationServer } = props;
+let annotation_count = 0;
 
-  const viewerState = useViewerState();
-  const { openSeadragonViewer, activeManifest } = viewerState;
+const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
+  const { canvas, useViewerState, token, annotationServer, useViewerDispatch } = props;
+
+  const viewerState = useViewerState() as any;	// need "informationPanelCounts" which is defined in patched GRPL version of Clover but not library plugin links to at compile time
+  const { openSeadragonViewer, activeManifest, informationPanelCounts } = viewerState;
 
   const [active, setActive] = useState(false);
   const [viewerId, setViewerId] = useState(openSeadragonViewer?.id);
 
   const editorDispatch: any = useEditorDispatch();
+  const viewerDispatch: any = useViewerDispatch();
   const editorState = useEditorState();
   const { annotations, annotorious } = editorState;
-
+  
   const activeCanvas = canvas.id;
   const fragmentUnit = "pixel";
   const fetchAnnotationRan = useRef(false);
@@ -46,6 +49,12 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
           type: "updateAnnotations",
           annotations: response,
         });
+        annotation_count = response.length;
+        viewerDispatch({
+		  count: annotation_count,
+		  panel: "AnnotationEditor",
+		  type: "updateInformationPanelCount",
+		});
       });
     }
 
@@ -66,8 +75,8 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
       fragmentUnit: fragmentUnit,
       widgets: ["COMMENT"],
       messages: {
-		  "Add a comment...": "Notes",
-		  "Add a reply...": "Notes",
+		  "Add a comment...": "Notes (optional)",
+		  "Add a reply...": "Notes (optional)",
 		  "Add tag...": "Tags",
 		  "Cancel": "Cancel",
 		  "Close": "Close",
@@ -94,6 +103,13 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
             type: "annotationsUpdatedAt",
             annotationsUpdatedAt: new Date().getTime(),
           });
+          
+        	annotation_count = informationPanelCounts['AnnotationEditor'] + 1;
+			viewerDispatch({
+			  count: annotation_count,
+			  panel: "AnnotationEditor",
+			  type: "updateInformationPanelCount",
+			});
         });
       },
     );
@@ -130,6 +146,13 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
             type: "annotationsUpdatedAt",
             annotationsUpdatedAt: new Date().getTime(),
           });
+          
+        annotation_count = informationPanelCounts['AnnotationEditor'] - 1;
+        viewerDispatch({
+		  count: annotation_count,
+		  panel: "AnnotationEditor",
+		  type: "updateInformationPanelCount",
+		});
         });
       },
     );

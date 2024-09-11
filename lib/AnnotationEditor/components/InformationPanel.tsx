@@ -33,13 +33,13 @@ export const InfomationPanel: React.FC<PropType> = ({
   const editorState = useEditorState();
   const { annotationsUpdatedAt, annotations, annotorious } = editorState;
   const dispatch: any = useEditorDispatch();
+  const vdispatch: any = useViewerDispatch();
 
   // fetch annotations when there is a change in annotationsUpdatedAt
   useEffect(() => {
     if (!annotationsUpdatedAt) return;
 
     fetchAnnotations(token, annotationServer).then((response) => {
-      console.log("InfomationPanel fetchAnnotations", response, annotationsUpdatedAt);
       dispatch({
         type: "updateAnnotations",
         annotations: response,
@@ -52,9 +52,28 @@ export const InfomationPanel: React.FC<PropType> = ({
         type: "updateAnnotorious",
         annotorious: annotorious,
       });
+      
+      if(annotations) {
+		  vdispatch({
+			  count: annotations.length,
+			  panel: "AnnotationEditor",
+			  type: "updateInformationPanelCount",
+			});
+		}
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [annotationsUpdatedAt]);
+  
+  // Pass annotation count to viewer for display in panel tab
+  useEffect(() => {
+	  if(annotations) {
+		  vdispatch({
+			  count: annotations.length,
+			  panel: "AnnotationEditor",
+			  type: "updateInformationPanelCount",
+			});
+		}
+  }, [annotations]);
 
   const msg = (annotationDownloadUrl && annotationDownloadLabel) ? <form action={annotationDownloadUrl} className="clippingDownload"><button className="clippingDownloadLink">{annotationDownloadLabel}</button></form> : '';
   
