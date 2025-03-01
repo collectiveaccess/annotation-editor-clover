@@ -17,10 +17,9 @@ import {
   convertIIIFAnnotationToWebAnnotation
 } from "../utils/annotation-utils";
 
-import { deleteIcon } from "../utils/annotation-icons";
-
 interface PropType extends PluginInformationPanel {
   annotation: AnnotationForEditor;
+  downloadUrl: string;
   setActiveTarget: React.Dispatch<
     React.SetStateAction<AnnotationTargetExtended | string | undefined>
   >;
@@ -37,6 +36,7 @@ const AnnotationItem: React.FC<PropType> = ({
   activeTarget,
   useViewerState,
   annotationServer,
+  downloadUrl,
   token,
 }) => {
   const dispatch: any = useViewerDispatch();
@@ -125,6 +125,12 @@ const AnnotationItem: React.FC<PropType> = ({
     	  annotorious.clearAnnotations();
         });
   }
+  
+  function handleDownload() {
+    if (!annotation.target) return;
+    const anno = convertIIIFAnnotationToWebAnnotation(annotation, "pixel");
+    window.location.href = downloadUrl + '/annotation_id/' + anno.id;
+  }
 
   function highlightAnnotation(annotation: AnnotationForEditor) {
     const allAnnotationEls = document.querySelectorAll(".a9s-annotation");
@@ -173,7 +179,8 @@ const AnnotationItem: React.FC<PropType> = ({
   return (
     <div className="clipping" style={{position: 'relative'}}>
       <button onClick={handleClick}>{processBody(annotation.body)}</button>
-      <button onClick={handleDelete}  style={{position: 'absolute', right: '5px', bottom: '5px', width: '24px'}}>{deleteIcon()}</button>
+      <button onClick={handleDelete}  style={{position: 'absolute', right: '5px', bottom: '5px', width: '24px'}}><i className="fas fa-trash-alt"></i></button>
+     <button onClick={handleDownload}  style={{position: 'absolute', right: '5px', top: '5px', width: '24px'}}><i className="fas fa-download"></i></button>
     </div>
   );
 };

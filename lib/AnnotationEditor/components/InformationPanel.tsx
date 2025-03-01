@@ -97,6 +97,7 @@ export const InfomationPanel: React.FC<PropType> = ({
           setActiveTarget={setActiveTarget}
           token={token}
           annotationServer={annotationServer}
+          downloadUrl={annotationDownloadUrl}
         />
       ))}
     </div>

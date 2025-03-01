@@ -82,7 +82,7 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
 		  "Close": "Close",
 		  "Edit": "Edit",
 		  "Delete": "Delete",
-		  "Ok": "Ok"
+		  "Ok": "Save"
 		}
     };
     const annotoriousInstance = Annotorious(openSeadragonViewer, options);
@@ -210,17 +210,7 @@ const AnnotationEditor: React.FC<PropType> = (props: PropType) => {
       onClick={clickHandler}
       className={`${active && styles.active} ${styles.toolbarBtn}`}
     >
-      <svg viewBox="0 0 80 80">
-        <g>
-          <rect x="18" y="25" width="46" height="30"></rect>
-          <g className="handles">
-            <circle cx="18" cy="25" r="5"></circle>
-            <circle cx="64" cy="25" r="5"></circle>
-            <circle cx="18" cy="55" r="5"></circle>
-            <circle cx="64" cy="55" r="5"></circle>
-          </g>
-        </g>
-      </svg>
+      <i className="fas fa-cut fa-sm"></i>
     </button>
   );
 };
